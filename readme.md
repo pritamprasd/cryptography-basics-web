@@ -31,7 +31,7 @@ src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17
 
 ## Fundamentals:
 ### Problem:
-![Problem](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://github.com/pritamprasd/cryptography-basics-web/blob/main/assets/plantuml/1_problem.txt)
+![Problem](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://github.com/pritamprasd/cryptography-basics-web/blob/73876ddecf06c203cc8ce81ba88882ee08591cd4/assets/plantuml/1_problem.txt)
 
 
 
