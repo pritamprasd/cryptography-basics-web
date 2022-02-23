@@ -31,8 +31,19 @@ src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17
 
 ## Fundamentals:
 ### Problem:
-![Problem](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://github.com/pritamprasd/cryptography-basics-web/blob/73876ddecf06c203cc8ce81ba88882ee08591cd4/assets/plantuml/1_problem.txt)
-
+```plantuml
+@startuml Problem
+!theme crt-green
+actor Ana as A
+actor Bob as B
+actor Hacker as H
+cloud Internet as I
+A -r-> I : Secret Message 
+I -r-> B : Secret Message 
+H -d-> I : snoopin
+@enduml
+```
+### Solution 1: 
 
 
 

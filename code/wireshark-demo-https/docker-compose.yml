@@ -1,0 +1,21 @@
+version: '3.6'
+services:
+  backend:
+    build: ./backend
+    command: python3 app.py
+    ports:
+      - 5001:5001
+    networks:
+      - cypto-demo-https
+
+  # ui:
+  #   build: ./ui
+  #   ports:
+  #     - 8999:8999
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - cypto-demo
+
+networks:
+  cypto-demo-https:

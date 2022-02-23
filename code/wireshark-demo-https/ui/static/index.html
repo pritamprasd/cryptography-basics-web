@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+</head>
+
+<body>
+    <button onclick="callHello()">Make Request</button>
+    <div id="responsetext"></div>
+    <script>
+        function callHello() {
+            console.log(`Make request button cliked`)
+            fetch('https://localhost:5001/hello')
+                .then(r => r.json())
+                .then(r => document.getElementById("responsetext").innerHTML = JSON.stringify(r))
+                .catch(r => console.error(JSON.stringify(r)))
+        }
+    </script>
+</body>
+
+</html>
