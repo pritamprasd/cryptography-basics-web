@@ -5,6 +5,7 @@ https://github.com/pritamprasd/poc-encrypt-flask-reactjs
 
 ### Encrypt data between UI(browser-sandbox) and Backend. 
 - https://github.com/pritamprasd/poc-encrypt-flask-reactjs/blob/two_way_encryption/comm.svg
+- #TODO, generate keypair is ephemeral.
 - ![solution diagram](./assets/images/1_ecies_sol.png)
 
 ### Considerations:
@@ -70,8 +71,8 @@ H -r-> CT:  `fixed-length` hash value(integer)
 - `collision-resistant` and `irreversible`
 - `MD5`(deprecated), `SHA-1`(deprecated),`SHA(SHA3-256, SHA-512)`, `BLAKE2s`, `RIPEMD-160`, `SM3`, `GOST`
 - PoW Hash functions: `ETHash`(Ethereum), `Equihash`(Bitcoin Gold, Zcash)
-- Breaking SHA-1: https://shattered.io/
 - Playground: https://www.fileformat.info/tool/hash.htm
+- Breaking SHA-1: https://shattered.io/
 - `Merkle–Damgård construction`: https://eng.libretexts.org/Under_Construction/Book%3A_The_Joy_of_Cryptography_(Rosulek)/Chapter_12%3A_Hash_Functions/12.3%3A_Merkle-Damg%C3%A5rd_Construction 
 
 
@@ -87,8 +88,8 @@ actor "Ana" as A
 actor Bob as B
 actor "Mallicious Attacker" as H
 cloud Internet as I
-A -r-> I : Encrypted text with key
-I -r-> B : Encrypted text with key
+A -r-> I : Encrypted text
+I -r-> B : Encrypted text 
 H -d-> I : encrypted garbage
 FA_KEY(key,key,label) #Yellow
 FA_KEY(key2,key,label) #Yellow
@@ -115,17 +116,102 @@ key2 ~u~ B
 
 
 ### Solution 3: Encrypt with asymmetric keypair.
-- diasgram
-- Issue: performance
-- 
+```plantuml
+@startuml
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+actor "Ana" as A 
+actor Bob as B
+actor "Mallicious Attacker" as H
+cloud Internet as I
+B ~l~> I : Get Bob's Public key
+I ~l~> A : Public Key <&key>
+H -d-> I : encrypted blob
+A -r-> I : Encrypted text
+I -r-> B : Encrypted text 
+FA_KEY(pk,Public Key,label) #Yellow
+FA_KEY(pk2,Public Key,label) #Yellow
+FA_KEY(sk,Private Key,label) #Orange
+pk ~u~ B
+pk2 ~u~ A
+sk ~u~ B
+@enduml
+```
+#### Asymmetric KeyPair: RSA(1977), ECC(2004-05)
+- `encryption`, `decryption`, `signing`, `verifying`, `key-generation`
+- RSA:
+  - explain rsa #TODO
+- ![AES vs RSA](./assets/images/aesvsrsa.png) <br/>
+src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithms.pdf
+
+- ECC:
+  - explain #ECC
 
 ### Solution 4: Utilize Key Exchange to share a symmetric key.
-
+- `DHKE`, `RSA-OAEP`, `ECDH`
+```plantuml
+@startuml
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+actor "Ana" as A 
+actor Bob as B
+actor "Mallicious Attacker" as H
+cloud Internet as I
+FA_KEY(pk,A's Public Key,label) #red
+FA_KEY(sk,A's Private Key,label) #Yellow
+FA_KEY(pk2,B's Public Key,label) #Blue
+FA_KEY(sk2,B's Private Key,label) #Green
+pk ~u~ A
+sk ~u~ A
+pk2 ~u~ B
+sk2 ~u~ B
+B <~l~> I : Public Key exchange
+I <~l~> A : Public Key exchange
+H -d-> I : encrypted blob
+@enduml
+```
+```plantuml
+@startuml
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+actor "Ana" as A 
+actor Bob as B
+actor "Mallicious Attacker" as H
+cloud Internet as I
+rectangle "Shared secret" as RS
+rectangle "Shared secret" as RS2
+FA_KEY(pk,A's Public Key,label) #red
+FA_KEY(sk,A's Private Key,label) #Yellow
+FA_KEY(pk2,B's Public Key,label) #Blue
+FA_KEY(sk2,B's Private Key,label) #Green
+pk2 ~u~ A
+sk ~u~ A
+sk2 ~u~ B
+pk ~u~ B
+B <~l~> I : Encrypted Text
+I <~l~> A : Encrypted Text
+H -d-> I : encrypted blob
+sk ~d~ RS
+pk2 ~d~ RS
+sk2 ~d~ RS2
+pk ~d~ RS2
+@enduml
+```
+- DHKE:
+- ECDH:
+- ECIES: ECDH + AES_GCM_128
 ### Solution 5: Use certs to proove identity
-
-### ECIES:
-
-
+Issue: How can Bob trust Ana? Ana obtains a refferal from a CA(Root CA in system).
 
 
 ## Links:
