@@ -5,18 +5,18 @@ https://github.com/pritamprasd/poc-encrypt-flask-reactjs
 
 ### Encrypt data between UI(browser-sandbox) and Backend. 
 - https://github.com/pritamprasd/poc-encrypt-flask-reactjs/blob/two_way_encryption/comm.svg
-- ![solution diagram](./assets/1_ecies_sol.png)
+- ![solution diagram](./assets/images/1_ecies_sol.png)
 
 ### Considerations:
 1. Secure Enough?
-- ![NIST Key size recommendations](./assets/Recommended_Algorithms_and_Key_Sizes.png) <br/> src: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57Pt3r1.pdf ,  https://apps.nsa.gov/iaarchive/programs/iad-initiatives/cnsa-suite.cfm
-- ![Time to break key](./assets/eccvsrsakeybreak.png)<br/>
+- ![NIST Key size recommendations](./assets/images/Recommended_Algorithms_and_Key_Sizes.png) <br/> src: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57Pt3r1.pdf ,  https://apps.nsa.gov/iaarchive/programs/iad-initiatives/cnsa-suite.cfm
+- ![Time to break key](./assets/images/eccvsrsakeybreak.png)<br/>
 src: http://ww1.microchip.com/downloads/en/DeviceDoc/00003442A.pdf
 - `How secure is 265-bit`: https://www.youtube.com/watch?v=S9JGmA5_unY
 - key length recommendation: https://www.keylength.com/en/4/ 
 
 2. Performance on Key-generation:
-![RSA vs ECC](./assets/rsavsecc.png)<br/>
+![RSA vs ECC](./assets/images/rsavsecc.png)<br/>
 src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17/ijaerv12n19_140.pdf)
 
 3. ECC JS Support:
@@ -31,18 +31,8 @@ src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17
 
 ## Fundamentals:
 ### Problem:
-```plantuml
-@startuml
-!theme crt-green
-actor Ana as A
-actor Bob as B
-actor Hacker as H
-cloud Internet as I
-A -r-> I : Secret Message 
-I -r-> B : Secret Message 
-H -d-> I : snoopin
-@enduml
-```
+![Problem](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://github.com/pritamprasd/cryptography-basics-web/blob/main/assets/plantuml/1_problem.txt)
+
 
 
 
