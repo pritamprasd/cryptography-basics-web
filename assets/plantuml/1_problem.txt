@@ -1,5 +1,4 @@
-```plantuml
-@startuml
+@startuml Problem
 !theme crt-green
 actor Ana as A
 actor Bob as B
@@ -9,4 +8,3 @@ A -r-> I : Secret Message
 I -r-> B : Secret Message 
 H -d-> I : snoopin
 @enduml
-```
