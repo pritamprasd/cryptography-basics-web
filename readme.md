@@ -76,10 +76,50 @@ H -r-> CT:  `fixed-length` hash value(integer)
 
 
 ### Solution 2: Encrypt with a key.
+```plantuml
+@startuml
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+actor "Ana" as A 
+actor Bob as B
+actor "Mallicious Attacker" as H
+cloud Internet as I
+A -r-> I : Encrypted text with key
+I -r-> B : Encrypted text with key
+H -d-> I : encrypted garbage
+FA_KEY(key,key,label) #Yellow
+FA_KEY(key2,key,label) #Yellow
+key ~u~ A 
+key2 ~u~ B
+@enduml
+```
+#### Symmetric Encryption: 
+`AES-256-GCM, AES-128-CTR`, `Serpent-128-CBC`
+- Algorithm: AES, ChaCha20, Twofish, Serpent, Camellia
+  - `AES`:
+    - `key-length` 128, 192 or 256-bit.
+    - input & output : 128 bit 
+    - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+- Block Cipher modes: repeatedly apply a cipher's single-block encryption.
+  - `ECB`: encrypts equal input blocks as equal output blocks. **Do NOT use it**
+  - `CBC`: works in block of fixed size; thus require padding (`PKCS7`/ `ANSI X.923`), `IV` is used to provide randomness.
+    - `PKCS7`: The value of each added byte is the number of bytes that are added(N bytes, each of value N are added).
+  - `CTR`: No `IV` needed, Counter acts as source of randomness. (XOR between portions of the plaintext and the internal cipher's state(no padding needed))
+  - `GCM`: `CTR` + `MAC`, generates `auth-code` while encryption.
+    - `MAC`: HMAC(key, msg, hash_func) -> hash
+  - https://www.highgo.ca/2019/08/08/the-difference-in-five-modes-in-the-aes-encryption-algorithm/
+- `KDF`: Deriving Key from Password `Bcrypt`, `Scrypt`. 
+
 
 ### Solution 3: Encrypt with asymmetric keypair.
+- diasgram
+- Issue: performance
+- 
 
-### Solution 4: Utilize Key Exchange to share key.
+### Solution 4: Utilize Key Exchange to share a symmetric key.
 
 ### Solution 5: Use certs to proove identity
 
