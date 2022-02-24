@@ -17,12 +17,13 @@ src: http://ww1.microchip.com/downloads/en/DeviceDoc/00003442A.pdf
 - key length recommendation: https://www.keylength.com/en/4/ 
 
 2. Performance on Key-generation:
-![RSA vs ECC](./assets/images/rsavsecc.png)<br/>
+- ![RSA vs ECC](./assets/images/rsavsecc.png)<br/>
 src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17/ijaerv12n19_140.pdf)
+- https://www.cryptopp.com/benchmarks.html
 
 3. ECC JS Support:
 - Issues:
-    - WebAPIS: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto, no ECC, only RsaOAEP.
+    - WebAPIS: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto, no ECC, only RSAOAEP.
     - Other libs: don't have flexibility for ecies
     - Performance is terribly slow.
 - Solution:
@@ -142,16 +143,39 @@ sk ~u~ B
 @enduml
 ```
 #### Asymmetric KeyPair: RSA(1977), ECC(2004-05)
+- Two keys, mathematically related, `Impossible to generate Private Key from Public Key`
 - `encryption`, `decryption`, `signing`, `verifying`, `key-generation`
-- RSA:
-  - explain rsa #TODO
+
+- `RSA`:
+  - Key generation: find three very large positive integers `e`, `d`, and `n`, such that for all integers `m` (with 0 ≤ m < n) <img src="https://render.githubusercontent.com/render/math?math=\color{red}\large\displaystyle (m^{e})^{d}\equiv m{\pmod {n}}"> 
+    - public key: (n,e)
+    - private key: (n,d)
+  - Why hard to break? `n = pq` (`p` and `q` are very large prime numbers); given `n` it's hard to find `p`,`q`. (Integer factorization problem)
+  - Encryption: `m**e (mod n)`
+  - Decryption: `m**d (mod n)`
 - ![AES vs RSA](./assets/images/aesvsrsa.png) <br/>
 src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithms.pdf
+- ![Hybrid Encryption Scheme](./assets/images/kemdem.png)
 
-- ECC:
-  - explain #ECC
 
-### Solution 4: Utilize Key Exchange to share a symmetric key.
+- `ECC`:
+  - Elliptic Curves: (`secp256k1`, `secp256r1`)<br/>
+    - <p float="left">
+      <img src="./assets/images/ecc1.png" width="500" />
+      <img src="./assets/images/ecc2.png" width="500" /> 
+      </p>
+    - Curve/Function: `y^2 = x^3 + ax +b` 
+    - EC Curve: `y^2 = x^3 + ax +b` over a `finite field` + Generator Point(`G`)
+      - `finite field` --> If `R = P + Q`, if `P` and `Q` lies in field , `R` too will lie on the field, 
+        and there can be atmost one such `R`. (`n` : number of all points on field).
+    - Playground: https://www.desmos.com/calculator/ialhd71we3
+  - Key generation: `P = k * G`
+    - `k` : private key : [0 .. n] (integer)
+    - `P` : public key (Point)
+  - Why hard to break? For a very large integer `k`, it’s very fast to calculate `P` = k * G ,  but extremely slow to calculate `k` if `G` and `P` are known.
+
+
+### Solution 4: Utilize Key Exchange to establish a symmetric key(hybrid encryption).
 - `DHKE`, `RSA-OAEP`, `ECDH`
 ```plantuml
 @startuml
@@ -207,14 +231,15 @@ sk2 ~d~ RS2
 pk ~d~ RS2
 @enduml
 ```
-- DHKE:
-- ECDH:
-- ECIES: ECDH + AES_GCM_128
-### Solution 5: Use certs to proove identity
+- `ECDH`:
+- `ECIES`: ECDH + AES_GCM_128
+
+### Solution 5: Sign message with Encryption:
+#TODO
 Issue: How can Bob trust Ana? Ana obtains a refferal from a CA(Root CA in system).
 
-
 ## Links:
+- Holy grail for this session: https://cryptobook.nakov.com/
 - Bitcoin address generator: https://www.bitaddress.org
 - 
 
