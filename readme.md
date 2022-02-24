@@ -265,6 +265,7 @@ src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithm
       <img src="./assets/images/ecc1.png" width="500" />
       <img src="./assets/images/ecc2.png" width="500" /> 
       </p>
+    - ![Finite field](https://cdn-images-1.medium.com/max/800/1*TB-tUijsbiCLGuNJ1kNU0g.gif)
     - Curve/Function: `y^2 = x^3 + ax +b` 
     - EC Curve: `y^2 = x^3 + ax +b` over a `finite field` + Generator Point(`G`)
       - `finite field` --> If `R = P + Q`, if `P` and `Q` lies in field , `R` too will lie on the field, 
@@ -344,4 +345,5 @@ Issue: How can Bob trust Ana? Ana obtains a refferal from a CA(Root CA in system
 
 ## Links:
 - Holy grail for this session: https://cryptobook.nakov.com/
+- Crypto Basics explainer: https://www.crypto101.io/
 - Bitcoin address generator: https://www.bitaddress.org
