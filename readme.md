@@ -10,7 +10,7 @@
   - [Solution 2: Encrypt with a key.](#solution-2-encrypt-with-a-key)
     - [Symmetric Encryption:](#symmetric-encryption)
       - [Algorithm: AES, ChaCha20, Twofish, Serpent, Camellia](#algorithm-aes-chacha20-twofish-serpent-camellia)
-      - [Block Cipher modes: repeatedly apply a cipher's single-block encryption.](#block-cipher-modes-repeatedly-apply-a-ciphers-single-block-encryption)
+      - [Block Cipher modes: (stream cipher) repeatedly apply a cipher's single-block encryption.](#block-cipher-modes-stream-cipher-repeatedly-apply-a-ciphers-single-block-encryption)
       - [`KDF`: Deriving Key from Password `Bcrypt`, `Scrypt`.](#kdf-deriving-key-from-password-bcrypt-scrypt)
   - [Solution 3: Encrypt with asymmetric keypair.](#solution-3-encrypt-with-asymmetric-keypair)
     - [Asymmetric KeyPair: RSA(1977), ECC(2004-05)](#asymmetric-keypair-rsa1977-ecc2004-05)
@@ -171,11 +171,11 @@ H -r-> CT:  encrypted blob
 ### Symmetric Encryption: 
 `AES-256-GCM, AES-128-CTR`, `Serpent-128-CBC`
 #### Algorithm: AES, ChaCha20, Twofish, Serpent, Camellia
-  - `AES`:
+  - `AES`(block cipher):
     - `key-length` 128, 192 or 256-bit.
     - input & output : 128 bit 
     - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
-#### Block Cipher modes: repeatedly apply a cipher's single-block encryption.
+#### Block Cipher modes: (stream cipher) repeatedly apply a cipher's single-block encryption.
   - `ECB`: encrypts equal input blocks as equal output blocks. **Do NOT use it**
   - `CBC`: works in block of fixed size; thus require padding (`PKCS7`/ `ANSI X.923`), `IV` is used to provide randomness.
     - `PKCS7`: The value of each added byte is the number of bytes that are added(N bytes, each of value N are added).
@@ -248,7 +248,7 @@ H2 -r-> PT2: decrypted plaintext
 - Two keys, mathematically related, `Impossible to generate Private Key from Public Key`
 - `encryption`, `decryption`, `signing`, `verifying`, `key-generation`
 #### `RSA`
-  - Key generation: find three very large positive integers `e`, `d`, and `n`, such that for all integers `m` (with 0 ≤ m < n) <img src="https://render.githubusercontent.com/render/math?math=\color{red}\large\displaystyle (m^{e})^{d}\equiv m{\pmod {n}}"> 
+  - Key generation: find three very large positive integers `e`, `d`, and `n`, such that for all integers `m` (with 0 ≤ m < n)<br/> <img src="https://render.githubusercontent.com/render/math?math=\color{red}\large\displaystyle (m^{e})^{d}\equiv m{\pmod {n}}"> 
     - public key: (n,e)
     - private key: (n,d)
   - Why hard to break? `n = pq` (`p` and `q` are very large prime numbers); given `n` it's hard to find `p`,`q`. (Integer factorization problem)
