@@ -261,20 +261,22 @@ src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithm
 
 #### `ECC`
   - Elliptic Curves: (`secp256k1`, `secp256r1`)<br/>
-    - <p float="left">
-      <img src="./assets/images/ecc1.png" width="500" />
-      <img src="./assets/images/ecc2.png" width="500" /> 
-      </p>
-    - ![Finite field](https://cdn-images-1.medium.com/max/800/1*TB-tUijsbiCLGuNJ1kNU0g.gif)
     - Curve/Function: `y^2 = x^3 + ax +b` 
     - EC Curve: `y^2 = x^3 + ax +b` over a `finite field` + Generator Point(`G`)
       - `finite field` --> If `R = P + Q`, if `P` and `Q` lies in field , `R` too will lie on the field, 
         and there can be atmost one such `R`. (`n` : number of all points on field).
     - Playground: https://www.desmos.com/calculator/ialhd71we3
+    - <p float="left">
+      <img src="./assets/images/ecc1.png" width="500" />
+      <img src="./assets/images/ecc2.png" width="500" /> 
+      </p>
+    - ![Finite field](https://cdn-images-1.medium.com/max/800/1*TB-tUijsbiCLGuNJ1kNU0g.gif)
+
   - Key generation: `P = k * G`
     - `k` : private key : [0 .. n] (integer)
     - `P` : public key (Point)
   - Why hard to break? For a very large integer `k`, it’s very fast to calculate `P` = k * G ,  but extremely slow to calculate `k` if `G` and `P` are known.
+  - EC curves: https://safecurves.cr.yp.to/equation.html 
 
 > certs demo
 
