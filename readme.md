@@ -1,14 +1,31 @@
 # Cryptography for Developers.
 
-## ECIES example:
+- [Cryptography for Developers.](#cryptography-for-developers)
+  - [ECIES example](#ecies-example)
+    - [Considerations](#considerations)
+    - [Solution with ECIES](#solution-with-ecies)
+  - [Problem statement](#problem-statement)
+  - [Solution 1: Hashed payload](#solution-1-hashed-payload)
+    - [Cryptographical Hash Functions:](#cryptographical-hash-functions)
+  - [Solution 2: Encrypt with a key.](#solution-2-encrypt-with-a-key)
+    - [Symmetric Encryption:](#symmetric-encryption)
+      - [Algorithm: AES, ChaCha20, Twofish, Serpent, Camellia](#algorithm-aes-chacha20-twofish-serpent-camellia)
+      - [Block Cipher modes: repeatedly apply a cipher's single-block encryption.](#block-cipher-modes-repeatedly-apply-a-ciphers-single-block-encryption)
+      - [`KDF`: Deriving Key from Password `Bcrypt`, `Scrypt`.](#kdf-deriving-key-from-password-bcrypt-scrypt)
+  - [Solution 3: Encrypt with asymmetric keypair.](#solution-3-encrypt-with-asymmetric-keypair)
+    - [Asymmetric KeyPair: RSA(1977), ECC(2004-05)](#asymmetric-keypair-rsa1977-ecc2004-05)
+      - [`RSA`](#rsa)
+      - [`ECC`](#ecc)
+  - [Solution 4: Utilize Key Exchange to establish a symmetric key(hybrid encryption).](#solution-4-utilize-key-exchange-to-establish-a-symmetric-keyhybrid-encryption)
+    - [`ECDH`](#ecdh)
+    - [`ECIES`: ECDH + AES_GCM_128 + MAC](#ecies-ecdh--aes_gcm_128--mac)
+  - [Solution 5: Sign message with Encryption:](#solution-5-sign-message-with-encryption)
+  - [Links:](#links)
+
+## ECIES example
 https://github.com/pritamprasd/poc-encrypt-flask-reactjs
 
-### Encrypt data between UI(browser-sandbox) and Backend. 
-- https://github.com/pritamprasd/poc-encrypt-flask-reactjs/blob/two_way_encryption/comm.svg
-- #TODO, generate keypair is ephemeral.
-- ![solution diagram](./assets/images/1_ecies_sol.png)
-
-### Considerations:
+### Considerations
 1. Secure Enough?
 - ![NIST Key size recommendations](./assets/images/Recommended_Algorithms_and_Key_Sizes.png) <br/> src: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57Pt3r1.pdf ,  https://apps.nsa.gov/iaarchive/programs/iad-initiatives/cnsa-suite.cfm
 - ![Time to break key](./assets/images/eccvsrsakeybreak.png)<br/>
@@ -29,10 +46,46 @@ src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17
 - Solution:
     - Rust implementation of ecies: https://docs.rs/ecies/latest/ecies/
     - WASM: https://github.com/ecies/rs-wasm
+### Solution with ECIES
+```plantuml
+@startuml
+!theme crt-green
+title Two-way encryption using ECIES
+actor user
+participant UI
+participant Backend
 
+user -> UI: Load Page
+activate UI
+UI -> Backend: GET /pubkey (SERVER_PKEY: server public key)
+activate Backend
+note right: SERVER_PKEY = Backend Public key\nSERVER_SKEY = Backend Private key
+Backend -> UI: SERVER_PKEY(in compressed base64 format)
+deactivate Backend
+UI --> UI: Generate key pair UI_SKEY, UI_PKEY (stored in-memory)
+note left: UI_PKEY = UI Public key\nUI_SKEY = UI Private key
+UI -> user: WebPage content
+deactivate UI
 
-## Fundamentals:
-### Problem:
+note over UI, Backend: Only SERVER_PKEY, UI_PKEY are shared across network.\nSERVER_SKEY, UI_SKEY always remains with owner
+
+user -> UI: POST /data
+activate UI
+UI --> UI: encrypt payload body with SERVER_PKEY * UI_SKEY
+UI -> Backend: POST /data (headers {x-pub-key : UI_PKEY})
+activate Backend
+Backend --> Backend: decrypt payload with SERVER_SKEY * UI_PKEY
+Backend --> Backend: encrypt response with SERVER_SKEY * UI_PKEY
+Backend -> UI: Encrypted payload
+deactivate Backend
+UI --> UI: Decrypt payload with SERVER_PKEY * UI_SKEY
+UI -> user: Response
+deactivate UI
+@enduml
+```
+src: https://github.com/pritamprasd/poc-encrypt-flask-reactjs/blob/two_way_encryption/comm.svg 
+
+## Problem statement
 ```plantuml
 @startuml Problem
 !theme crt-green
@@ -45,7 +98,8 @@ I -r-> B : Secret Message in Plaintext
 H -d-> I : can read request/response
 @enduml
 ```
-### Solution 1: Hashed payload
+> wireshark demo
+## Solution 1: Hashed payload
 ```plantuml
 @startuml Problem
 !theme crt-green
@@ -58,7 +112,7 @@ I -r-> B : hash(Message)
 H -d-> I : hashed data(irreversible)
 @enduml
 ```
-#### Cryptographical Hash Functions:
+### Cryptographical Hash Functions:
 ```plantuml
 @startuml Problem
 !theme crt-green
@@ -77,7 +131,7 @@ H -r-> CT:  `fixed-length` hash value(integer)
 - `Merkle–Damgård construction`: https://eng.libretexts.org/Under_Construction/Book%3A_The_Joy_of_Cryptography_(Rosulek)/Chapter_12%3A_Hash_Functions/12.3%3A_Merkle-Damg%C3%A5rd_Construction 
 
 
-### Solution 2: Encrypt with a key.
+## Solution 2: Encrypt with a key.
 ```plantuml
 @startuml
 skinparam defaultTextAlignment center
@@ -94,18 +148,34 @@ I -r-> B : Encrypted text
 H -d-> I : encrypted garbage
 FA_KEY(key,key,label) #Yellow
 FA_KEY(key2,key,label) #Yellow
-key ~u~ A 
-key2 ~u~ B
+key ~r~ A 
+key2 ~l~ B
 @enduml
 ```
-#### Symmetric Encryption: 
+```plantuml
+@startuml Problem
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+file "Plaintext" as PT #navy
+file "CipherText" as CT #gray
+rectangle "Symmetric Encryption" as H
+FA_KEY(key,key,label) #Yellow
+key -d-> H : key
+PT -r-> H:  text or binary data
+H -r-> CT:  encrypted blob
+@enduml
+```
+### Symmetric Encryption: 
 `AES-256-GCM, AES-128-CTR`, `Serpent-128-CBC`
-- Algorithm: AES, ChaCha20, Twofish, Serpent, Camellia
+#### Algorithm: AES, ChaCha20, Twofish, Serpent, Camellia
   - `AES`:
     - `key-length` 128, 192 or 256-bit.
     - input & output : 128 bit 
     - https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
-- Block Cipher modes: repeatedly apply a cipher's single-block encryption.
+#### Block Cipher modes: repeatedly apply a cipher's single-block encryption.
   - `ECB`: encrypts equal input blocks as equal output blocks. **Do NOT use it**
   - `CBC`: works in block of fixed size; thus require padding (`PKCS7`/ `ANSI X.923`), `IV` is used to provide randomness.
     - `PKCS7`: The value of each added byte is the number of bytes that are added(N bytes, each of value N are added).
@@ -113,10 +183,10 @@ key2 ~u~ B
   - `GCM`: `CTR` + `MAC`, generates `auth-code` while encryption.
     - `MAC`: HMAC(key, msg, hash_func) -> hash
   - https://www.highgo.ca/2019/08/08/the-difference-in-five-modes-in-the-aes-encryption-algorithm/
-- `KDF`: Deriving Key from Password `Bcrypt`, `Scrypt`. 
+#### `KDF`: Deriving Key from Password `Bcrypt`, `Scrypt`. 
 
 
-### Solution 3: Encrypt with asymmetric keypair.
+## Solution 3: Encrypt with asymmetric keypair.
 ```plantuml
 @startuml
 skinparam defaultTextAlignment center
@@ -142,11 +212,42 @@ pk2 ~u~ A
 sk ~u~ B
 @enduml
 ```
-#### Asymmetric KeyPair: RSA(1977), ECC(2004-05)
+```plantuml
+@startuml Problem
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+file "Plaintext" as PT #navy
+file "CipherText" as CT #gray
+rectangle "Symmetric Encryption" as H
+FA_KEY(pk,"Public Key",label) #Yellow
+pk -d-> H : key
+PT -r-> H:  text or binary data
+H -r-> CT:  encrypted blob
+@enduml
+```
+```plantuml
+@startuml Problem
+skinparam defaultTextAlignment center
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!include ICONURL/font-awesome/key.puml
+!theme crt-green
+file "Plaintext" as PT2 #navy
+file "CipherText" as CT2 #gray
+rectangle "Symmetric Decryption" as H2
+FA_KEY(sk,"Private Key",label) #Orange
+sk -d-> H2 : key
+CT2 -r-> H2: encrypted blob
+H2 -r-> PT2: decrypted plaintext
+@enduml
+```
+### Asymmetric KeyPair: RSA(1977), ECC(2004-05)
 - Two keys, mathematically related, `Impossible to generate Private Key from Public Key`
 - `encryption`, `decryption`, `signing`, `verifying`, `key-generation`
-
-- `RSA`:
+#### `RSA`
   - Key generation: find three very large positive integers `e`, `d`, and `n`, such that for all integers `m` (with 0 ≤ m < n) <img src="https://render.githubusercontent.com/render/math?math=\color{red}\large\displaystyle (m^{e})^{d}\equiv m{\pmod {n}}"> 
     - public key: (n,e)
     - private key: (n,d)
@@ -158,7 +259,7 @@ src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithm
 - ![Hybrid Encryption Scheme](./assets/images/kemdem.png)
 
 
-- `ECC`:
+#### `ECC`
   - Elliptic Curves: (`secp256k1`, `secp256r1`)<br/>
     - <p float="left">
       <img src="./assets/images/ecc1.png" width="500" />
@@ -174,8 +275,10 @@ src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithm
     - `P` : public key (Point)
   - Why hard to break? For a very large integer `k`, it’s very fast to calculate `P` = k * G ,  but extremely slow to calculate `k` if `G` and `P` are known.
 
+> certs demo
 
-### Solution 4: Utilize Key Exchange to establish a symmetric key(hybrid encryption).
+
+## Solution 4: Utilize Key Exchange to establish a symmetric key(hybrid encryption).
 - `DHKE`, `RSA-OAEP`, `ECDH`
 ```plantuml
 @startuml
@@ -231,18 +334,14 @@ sk2 ~d~ RS2
 pk ~d~ RS2
 @enduml
 ```
-- `ECDH`:
-- `ECIES`: ECDH + AES_GCM_128
+### `ECDH`
+### `ECIES`: ECDH + AES_GCM_128 + MAC
+  - ![How ECIES Works](./assets/images/ecies.png)
 
-### Solution 5: Sign message with Encryption:
+## Solution 5: Sign message with Encryption:
 #TODO
 Issue: How can Bob trust Ana? Ana obtains a refferal from a CA(Root CA in system).
 
 ## Links:
 - Holy grail for this session: https://cryptobook.nakov.com/
 - Bitcoin address generator: https://www.bitaddress.org
-- 
-
-
-
-
