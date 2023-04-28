@@ -47,6 +47,7 @@ src: [RSA and ECC: A Comparative Analysis](https://www.ripublication.com/ijaer17
     - Rust implementation of ecies: https://docs.rs/ecies/latest/ecies/
     - WASM: https://github.com/ecies/rs-wasm
 ### Solution with ECIES
+![](./assets/images/1.png)<br/>
 ```plantuml
 @startuml
 !theme crt-green
@@ -86,6 +87,7 @@ deactivate UI
 src: https://github.com/pritamprasd/poc-encrypt-flask-reactjs/blob/two_way_encryption/comm.svg 
 
 ## Problem statement
+![](./assets/images/2.png)<br/>
 ```plantuml
 @startuml Problem
 !theme crt-green
@@ -100,6 +102,7 @@ H -d-> I : can read request/response
 ```
 > wireshark demo
 ## Solution 1: Hashed payload
+![](./assets/images/3.png)<br/>
 ```plantuml
 @startuml Problem
 !theme crt-green
@@ -113,6 +116,7 @@ H -d-> I : hashed data(irreversible)
 @enduml
 ```
 ### Cryptographical Hash Functions:
+![](./assets/images/4.png)<br/>
 ```plantuml
 @startuml Problem
 !theme crt-green
@@ -132,6 +136,7 @@ H -r-> CT:  `fixed-length` hash value(integer)
 
 
 ## Solution 2: Encrypt with a key.
+![](./assets/images/5.png)<br/>
 ```plantuml
 @startuml
 skinparam defaultTextAlignment center
@@ -152,6 +157,7 @@ key ~r~ A
 key2 ~l~ B
 @enduml
 ```
+![](./assets/images/6.png)<br/>
 ```plantuml
 @startuml Problem
 skinparam defaultTextAlignment center
@@ -187,6 +193,7 @@ H -r-> CT:  encrypted blob
 
 
 ## Solution 3: Encrypt with asymmetric keypair.
+![](./assets/images/7.png)<br/>
 ```plantuml
 @startuml
 skinparam defaultTextAlignment center
@@ -212,6 +219,7 @@ pk2 ~u~ A
 sk ~u~ B
 @enduml
 ```
+![](./assets/images/8.png)<br/>
 ```plantuml
 @startuml Problem
 skinparam defaultTextAlignment center
@@ -228,6 +236,7 @@ PT -r-> H:  text or binary data
 H -r-> CT:  encrypted blob
 @enduml
 ```
+![](./assets/images/9.png)<br/>
 ```plantuml
 @startuml Problem
 skinparam defaultTextAlignment center
@@ -283,6 +292,7 @@ src: https://www.ijemr.net/DOC/ComparativeAnalysisOfDESAESRSAEncryptionAlgorithm
 
 ## Solution 4: Utilize Key Exchange to establish a symmetric key(hybrid encryption).
 - `DHKE`, `RSA-OAEP`, `ECDH`
+![](./assets/images/10.png)<br/>
 ```plantuml
 @startuml
 skinparam defaultTextAlignment center
@@ -307,6 +317,7 @@ I <~l~> A : Public Key exchange
 H -d-> I : encrypted blob
 @enduml
 ```
+![](./assets/images/11.png)<br/>
 ```plantuml
 @startuml
 skinparam defaultTextAlignment center
